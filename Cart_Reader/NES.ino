@@ -27,9 +27,9 @@
 /******************************************
   Supported Mappers
  *****************************************/
-// Supported Mapper Array (iNES Mapper #s)
+// Supported Mapper Array (NES 2.0 Mapper #s)
 // Format = {mapper,prglo,prghi,chrlo,chrhi,ramlo,ramhi}
-static const byte PROGMEM mapsize[] = {
+static const uint16_t PROGMEM mapsize[] = {
   0, 0, 1, 0, 1, 0, 2,   // nrom                                                [sram r/w]
   1, 1, 5, 0, 5, 0, 3,   // mmc1                                                [sram r/w]
   2, 2, 4, 0, 0, 0, 0,   // uxrom
@@ -204,8 +204,8 @@ const char _file_name_with_number_fmt[] PROGMEM = "%s.%02d.%s";
   Variables
 *****************************************/
 // Mapper
-byte mapcount = (sizeof(mapsize) / sizeof(mapsize[0])) / 7;
-byte mapselect;
+uint16_t mapcount = (sizeof(mapsize) / sizeof(mapsize[0])) / 7;
+uint16_t mapselect;
 
 const int PRG[] PROGMEM = { 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
 byte prglo = 0;  // Lowest Entry
@@ -1750,9 +1750,9 @@ chooseMapper:
 
   // Check if valid
   boolean validMapper = 0;
-  byte mapcount = (sizeof(mapsize) / sizeof(mapsize[0])) / 7;
-  for (byte currMaplist = 0; currMaplist < mapcount; currMaplist++) {
-    if (pgm_read_byte(mapsize + currMaplist * 7) == newmapper)
+  uint16_t mapcount = (sizeof(mapsize) / sizeof(mapsize[0])) / 7;
+  for (uint16_t currMaplist = 0; currMaplist < mapcount; currMaplist++) {
+    if (pgm_read_byte((uint32_t)(mapsize + currMaplist * 7)) == newmapper)
       validMapper = 1;
   }
 
@@ -1831,8 +1831,8 @@ setmapper:
   String newmap;
   boolean mapfound = false;
   Serial.println(F("SUPPORTED MAPPERS:"));
-  for (int i = 0; i < mapcount; i++) {
-    int index = i * 7;
+  for (uint32_t i = 0; i < (uint32_t)mapcount; i++) {
+    uint32_t index = i * 7;
     mapselect = pgm_read_byte(mapsize + index);
     Serial.print("[");
     Serial.print(mapselect);
@@ -1874,8 +1874,8 @@ setmapper:
 }
 
 void checkMapperSize() {
-  for (int i = 0; i < mapcount; i++) {
-    int index = i * 7;
+  for (uint32_t i = 0; i < (uint32_t)mapcount; i++) {
+    uint32_t index = i * 7;
     byte mapcheck = pgm_read_byte(mapsize + index);
     if (mapcheck == mapper) {
       prglo = pgm_read_byte(mapsize + index + 1);
