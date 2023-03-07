@@ -194,8 +194,17 @@ char ver[5] = "12.4";
 // Write all info to OSCR_LOG.txt in root dir
 #define global_log
 
+// Determines what format NES header to use
+#define nes_nes20
+// #define nes_ines
+
 // Renames ROM if found in database
-#define nointro
+#define nes_rename
+
+// Validate that at least one header format is specified if NES ROMs are being used
+#if defined(enable_NES) && !defined(nes_nes20) && !defined(nes_ines)
+#error !!! PLEASE CHOOSE NES HEADER FORMAT !!!
+#endif
 
 // Ignores errors that normally force a reset if button 2 is pressed
 // #define debug_mode
@@ -531,7 +540,7 @@ void draw_progressbar(uint32_t processedsize, uint32_t totalsize);
 byte eepbit[8];
 byte eeptemp;
 
-#ifdef nointro
+#ifdef nes_rename
 // Array to hold iNES header
 byte iNES_HEADER[16];
 //ID 0-3
@@ -774,7 +783,7 @@ void rewind_line(FsFile& readfile, byte count = 1) {
 
 // Calculate CRC32 if needed and compare it to CRC read from database
 boolean compareCRC(const char* database, uint32_t crc32sum, boolean renamerom, int offset) {
-#ifdef nointro
+#ifdef nes_rename
   char crcStr[9];
   print_Msg(F("CRC32... "));
   display_Update();
@@ -852,7 +861,7 @@ boolean compareCRC(const char* database, uint32_t crc32sum, boolean renamerom, i
         if (renamerom) {
           println_Msg(gamename);
 
-          // Rename file to nointro
+          // Rename file to NES game name
           sd.chdir(folder);
           delay(100);
           if (myFile.open(fileName, O_READ)) {
@@ -876,9 +885,9 @@ boolean compareCRC(const char* database, uint32_t crc32sum, boolean renamerom, i
     print_Error(F("Database missing"));
     return 0;
   }
-#else   // nointro
+#else   // nes_rename
   println_Msg("");
-#endif  // !nointro
+#endif  // !nes_rename
   return 0;
 }
 
@@ -1064,7 +1073,7 @@ void mainMenu() {
       display_Clear();
       display_Update();
       setup_NES();
-#ifdef nointro
+#ifdef nes_rename
       getMapping();
 #endif
       checkStatus_NES();
@@ -1444,7 +1453,7 @@ void consoles80Menu() {
       display_Clear();
       display_Update();
       setup_NES();
-#ifdef nointro
+#ifdef nes_rename
       getMapping();
 #endif
       checkStatus_NES();

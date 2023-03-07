@@ -247,7 +247,11 @@ byte newramsize;
   Menus
 *****************************************/
 // NES start menu
-static const char nesMenuItem1[] PROGMEM = "Read iNES Rom";
+#ifdef nes_nes20
+static const char nesMenuItem1[] PROGMEM = "Read NES 2.0 ROM";
+#else if defined(nes_ines)
+static const char nesMenuItem1[] PROGMEM = "Read iNES ROM";
+#endif
 static const char nesMenuItem2[] PROGMEM = "Read PRG/CHR";
 static const char nesMenuItem3[] PROGMEM = "Read Sram";
 static const char nesMenuItem4[] PROGMEM = "Write Sram";
@@ -257,7 +261,7 @@ static const char nesMenuItem6[] PROGMEM = "Flash NESMaker";
 static const char* const menuOptionsNES[] PROGMEM = { nesMenuItem1, nesMenuItem2, nesMenuItem3, nesMenuItem4, nesMenuItem5, nesMenuItem6, string_reset2 };
 
 // NES chips menu
-#ifndef nointro
+#ifndef nes_rename
 static const char nesChipsMenuItem1[] PROGMEM = "Read PRG & CHR";
 #else
 static const char nesChipsMenuItem1[] PROGMEM = "Combined PRG+CHR";
@@ -280,7 +284,7 @@ void nesMenu() {
   switch (answer) {
     // Read Rom
     case 0:
-#ifndef nointro
+#ifndef nes_rename
       CartStart();
       readPRG(false);
       delay(2000);
@@ -380,7 +384,7 @@ void nesChipMenu() {
   switch (answer) {
     // Read combined PRG/CHR
     case 0:
-#ifndef nointro
+#ifndef nes_rename
       CreateROMFolderInSD();
       readPRG(false);
       resetROM();
@@ -470,9 +474,9 @@ void setup_NES() {
 }
 
 /******************************************
-   Get Mapping from nointro SD database
+   Get Mapping from iNES SD database
  *****************************************/
-#ifdef nointro
+#ifdef nes_ines
 // no clue (taken from fceux)
 uint32_t uppow2(uint32_t n) {
   int x;
@@ -1174,7 +1178,7 @@ void CreateRAMFileInSD() {
   myFile = createNewFile("RAM", "bin");
 }
 
-#ifndef nointro
+#ifndef nes_rename
 void CartStart() {
   sd.chdir();
   EEPROM_readAnything(0, foldern);  // FOLDER #
@@ -1193,7 +1197,7 @@ void CartFinish() {
 /******************************************
    NES 2.0 Header Functions
  *****************************************/
-#ifndef nointro
+#ifdef nes_nes20
 int32_t atoi32_signed(const char* input_string) {
   if (input_string == NULL) {
     return 0;
@@ -3677,9 +3681,9 @@ void readPRG(boolean readrom) {
       println_Msg(F("PRG FILE DUMPED!"));
       println_Msg(F(""));
       display_Update();
-#ifndef nointro
-      printCRC(fileName, &prg_crc32, 0);
-#endif
+// #ifndef nointro
+//       printCRC(fileName, &prg_crc32, 0);
+// #endif
     }
   }
   set_address(0);
@@ -4610,9 +4614,9 @@ void readCHR(boolean readrom) {
         println_Msg(F("CHR FILE DUMPED!"));
         println_Msg(F(""));
         display_Update();
-#ifndef nointro
-        printCRC(fileName, &chr_crc32, 0);
-#endif
+// #ifndef nointro
+//         printCRC(fileName, &chr_crc32, 0);
+// #endif
       }
     }
   }
